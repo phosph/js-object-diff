@@ -7,9 +7,11 @@ specifiers:
   '@types/node': ^18.0.1
   diff: ^5.1.0
   jest: ^28.1.2
+  rimraf: ^3.0.2
   ts-jest: ^28.0.5
   ts-node: ^10.8.2
   typescript: ^4.7.4
+  yarpm: ^1.1.1
 
 dependencies:
   '@types/diff': 5.0.2
@@ -20,9 +22,11 @@ devDependencies:
   '@types/jest': 28.1.4
   '@types/node': 18.0.1
   jest: 28.1.2_hxaxlvfys2pc3hefxwkmyo5cpq
+  rimraf: 3.0.2
   ts-jest: 28.0.5_lt5llx2ti6zt4eclhanfli5ynu
   ts-node: 10.8.2_qqrtuuv3y2pz7xoxv47yka6pmi
   typescript: 4.7.4
+  yarpm: 1.1.1
 
 packages:
 
@@ -1010,6 +1014,10 @@ packages:
 
   /color-name/1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
+    dev: true
+
+  /command-exists/1.2.9:
+    resolution: {integrity: sha512-LTQ/SGc+s0Xc0Fu5WaKnR0YiygZkm9eKFvyS+fRsU7/ZWFF8ykFM6Pc9aCVf1+xasOOZpO3BAVgVrKvsqKHV7w==}
     dev: true
 
   /concat-map/0.0.1:
@@ -2372,6 +2380,14 @@ packages:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 21.0.1
+    dev: true
+
+  /yarpm/1.1.1:
+    resolution: {integrity: sha512-A3gVdtyld+gYcVmKScvJqS2oT/i9xdsb/SqDsY9c0+BeYdYBUJrRfr4pD7UP+5uXEneJ0BL0rC/6rd1fnlYEcg==}
+    hasBin: true
+    dependencies:
+      command-exists: 1.2.9
+      cross-spawn: 7.0.3
     dev: true
 
   /yn/3.1.1:
