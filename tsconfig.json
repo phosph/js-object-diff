@@ -1,6 +1,7 @@
 {
     "compileOnSave": false,
     "compilerOptions": {
+        "baseUrl": "./",
         "outDir": "./dist",
         "esModuleInterop": true,
         "strict": true,
@@ -15,6 +16,7 @@
     },
     "exclude": [
         "node_modules",
-        "dist"
+        "dist",
+        "src/**/*.spec.ts"
     ]
 }

@@ -9,29 +9,30 @@ interface IValueDiff {
   __old: any;
   __new: any;
 }
-interface INestedDiff {
+interface INestedDiff<T, U> {
   readonly diff: boolean;
   readonly nested: true;
-  readonly internal: Record<string, Change>;
+  readonly internal: Record<string, Diff<T, U>>;
 }
 interface IStringDiff extends IValueDiff {
-  strDiff?: DiffChange[];
+  strDiff: DiffChange[];
 }
 interface IArrayDiff {
   readonly diff: boolean;
   readonly nested: true;
-  readonly internal: Change[];
+  readonly internal: Diff<any, any>[];
 }
 
-export class Diff<T,U> {
+export abstract class Diff<T = any,U = any> {
   constructor(
     public readonly obj1: T,
     public readonly obj2: U
   ) { }
 
   static compare<R,S>(obj1:R, obj2: S) {
-    return diff(obj1, obj2);
+    return diff<R,S>(obj1, obj2);
   }
+  abstract readonly diff: any
 }
 export class NoDiff<T> extends Diff<T,T> implements INoDiff {
   readonly diff = false;
@@ -53,28 +54,30 @@ export class ValueDiff<T,U> extends Diff<T,U> implements IValueDiff {
   get __new() { return this.obj2 }
 }
 export class StringDiff extends ValueDiff<string, string> implements IStringDiff {
-  get [Symbol.toStringTag]() { return 'StringDiff'; }
+  get [Symbol.toStringTag]() {
+    return 'StringDiff';
+  }
 
-  protected _cachedDiff: DiffChange[] | null = null
+  protected _cachedDiff: DiffChange[] | null = null;
 
   get strDiff() {
-    this._cachedDiff ??= diffChars(this.__old, this.__new);
-    return this._cachedDiff;
+    this._cachedDiff ??= diffChars(this.__old, this.__new) || null;
+    return this._cachedDiff!;
   }
 }
-export class ObjectDiff extends Diff<any, any> implements INestedDiff {
+export class ObjectDiff<T extends Record<string, any>, U extends Record<string, any>> extends Diff<T, U> implements INestedDiff<T, U> {
 
   get [Symbol.toStringTag]() { return 'NestedDiff'; }
 
   readonly nested = true;
 
-  protected _cachedDiffValue: INestedDiff['diff'] | null = null;
+  protected _cachedDiffValue: INestedDiff<T,U>['diff'] | null = null;
   get diff() {
     if (this._cachedDiffValue === null) this.calcDeps()
     return this._cachedDiffValue!;
   };
 
-  protected _cachedInternal: INestedDiff['internal'] | null = null;
+  protected _cachedInternal: INestedDiff<T,U>['internal'] | null = null;
   get internal() {
     if (this._cachedInternal === null) this.calcDeps()
     return this._cachedInternal!;
@@ -84,7 +87,7 @@ export class ObjectDiff extends Diff<any, any> implements INestedDiff {
     const a = Object.keys(this.obj1)
       .concat(Object.keys(this.obj2))
       .filter((item, index, self) => self.indexOf(item) === index)
-      .map(key => [key, diff(this.obj1[key], this.obj2[key])]) as [string, Change][]
+      .map(key => [key, diff(this.obj1[key], this.obj2[key])]) as [string, Diff][]
 
     this._cachedDiffValue = !!a.find(([_, value]) => value.diff)
 
@@ -96,8 +99,9 @@ export class ArrayDiff extends Diff<any, any> implements IArrayDiff {
 
   readonly nested = true
 
-  protected _cachedDiffValue: INestedDiff['diff'] | null = null;
+  protected _cachedDiffValue: INestedDiff<any, any>['diff'] | null = null;
   get diff() {
+    console.log('diff', this._cachedDiffValue);
     if (this._cachedDiffValue === null) this.calcDeps()
     return this._cachedDiffValue!;
   };
@@ -110,45 +114,37 @@ export class ArrayDiff extends Diff<any, any> implements IArrayDiff {
   }
 
   protected calcDeps() {
-    const diffArray: Change[] = []
-    // console.debug( this.obj1, this.obj2, )
+    const diffArray: Diff[] = []
     for (let i = 0; i < Math.max(this.obj1.length, this.obj2.length); i++) {
       const df = diff(
         this.obj1.length > i ? this.obj1[i] : null,
         this.obj2.length > i ? this.obj2[i] : null,
       );
-      // console.debug( df )
       diffArray.push(df);
-
-      this._cachedDiffValue ||= df.diff
+      console.log('df.diff');
+      this._cachedDiffValue ||= !!df.diff
     }
-    this._cachedDiff =  diffArray;
+    this._cachedDiff = diffArray;
+    if (this._cachedDiffValue === null) this._cachedDiffValue = false
   }
 }
 
-export type Change<T = any> =
-  | NoDiff<T>
-  | ValueDiff<any, any>
-  | ObjectDiff
-  | StringDiff
-  | ArrayDiff
 
-function diff(obj1: any, obj2: any): Change {
-  let df: Change;
+function diff<T,U>(obj1: T, obj2: U): Diff<T,U> {
+  let df: Diff;
 
   if (Object.is(obj1, obj2)) {
-    df = new NoDiff(obj1, obj2)
+    df = new NoDiff<T>(obj1, (obj2 as unknown) as T)
   } else if (typeof obj1 !== typeof obj2) {
     df = new ValueDiff(obj1, obj2)
   } else {
     if (Array.isArray(obj1) && Array.isArray(obj2)) {
       df = new ArrayDiff(obj1, obj2);
-      // df = new ArrayDiff(obj1, obj2.map(s => s.substring(1)+'x'));
     } else if (Array.isArray(obj1) || Array.isArray(obj2) || obj1 === null || obj2 === null) {
       df = new ValueDiff(obj1, obj2);
     } else if (typeof obj1 === 'object') {
       df = new ObjectDiff(obj1, obj2);
-    } else if (typeof obj1 === 'string') {
+    } else if (typeof obj1 === 'string' && typeof obj2 === 'string') {
       df = new StringDiff(obj1, obj2);
     } else {
       df = new ValueDiff(obj1, obj2);
