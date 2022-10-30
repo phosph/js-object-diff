@@ -121,7 +121,6 @@ export class ArrayDiff extends Diff<any, any> implements IArrayDiff {
         this.obj2.length > i ? this.obj2[i] : null,
       );
       diffArray.push(df);
-      console.log('df.diff');
       this._cachedDiffValue ||= !!df.diff
     }
     this._cachedDiff = diffArray;
@@ -143,7 +142,7 @@ function diff<T,U>(obj1: T, obj2: U): Diff<T,U> {
     } else if (Array.isArray(obj1) || Array.isArray(obj2) || obj1 === null || obj2 === null) {
       df = new ValueDiff(obj1, obj2);
     } else if (typeof obj1 === 'object') {
-      df = new ObjectDiff(obj1, obj2);
+      df = new ObjectDiff(obj1, obj2!);
     } else if (typeof obj1 === 'string' && typeof obj2 === 'string') {
       df = new StringDiff(obj1, obj2);
     } else {

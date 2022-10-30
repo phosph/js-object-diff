@@ -83,7 +83,7 @@ describe('object diff test', () => {
     }
   })
   it('Diff.compare([],{})', () => {
-    const a = []
+    const a: any[] = []
     const b = {}
     const result = Diff.compare(a,b)
     expect(result).toBeInstanceOf(Diff)

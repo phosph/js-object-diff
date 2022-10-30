@@ -1,7 +1,7 @@
 {
   "name": "@jashitory/js-object-diff",
-  "version": "1.0.1",
-  "description": "",
+  "version": "1.0.2",
+  "description": "Get nested Diff between Two objects",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "type": "module",
@@ -12,13 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "s"
+    "url": "github:phosph/js-object-diff"
   },
   "keywords": [
     "diff",
     "compare"
   ],
   "author": "Jesus Figueredo <jafigueredo@gmail.com>",
+  "homepage": "https://github.com/phosph/js-object-diff#readme",
   "license": "ISC",
   "dependencies": {
     "@types/diff": "^5.0.2",
