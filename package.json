@@ -1,6 +1,6 @@
 {
   "name": "@jashitory/js-object-diff",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Get nested Diff between Two objects",
   "main": "src/main.ts",
   "publishConfig": {
